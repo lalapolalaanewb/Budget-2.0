@@ -49,6 +49,115 @@ body {
     height: 100vh;
     width: 100vw;
 
+    /* login page css START HERE */
+    .container {
+        // border: $bordercheck;
+        position: absolute;
+        display: flex;
+        flex-flow: column wrap;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        .logo_login {
+            color: color(primary);
+            font-weight: fontweight(semi-bold);
+            font-size: 60px;
+            text-transform: uppercase;
+            text-align: center;
+            padding-bottom: 70px;
+
+            span {
+                color: color(accentspink);
+            }
+        }
+
+        .form_login {
+            position: relative;
+
+            .error_message {
+                position: absolute;
+                width: 100%;
+                display: none;
+                background-color: color(dark);
+                color: color(light);
+                border-radius: 10px;
+                font-weight: fontweight(semi-bold);
+                padding: 6px 10px 6px 10px;
+                left: 50%;
+                // top: -50%;
+                transform: translate(-50%, 0) scale(0);
+                animation: mvltr 0.5s ease-in-out forwards;
+                
+                @keyframes mvltr{
+                    0% {
+                        transform: translate(-50%, 0) scale(0);
+                    }
+                    100% {
+                        transform: translate(-50%, -130%) scale(1);
+                    }
+                }
+            }
+
+            .error_message::after {
+                position: absolute;
+                content: '';
+                // background-color: red;
+                width: 0;
+                height: 0;
+                left: 50%;
+                top: 100%;
+                transform: translateX(-50%);
+                border-left: 10px solid transparent;
+                border-right: 10px solid transparent;
+                border-top:10px solid color(accentspink);
+            }
+
+            .form_input {
+                border-radius: 10px;
+                padding: 6px;
+            }
+    
+            .form_input:focus {
+                border-color: color(accentspink);
+            }
+    
+            .input-login {
+                margin-right: 5px;
+            }
+    
+            .input-password {
+                margin-left: 5px;
+            }
+    
+            .form_login-btn {
+                // border: $bordercheck;
+                display: flex;
+                flex-flow: row wrap;
+                justify-content: space-between;
+                padding-top: 20px;
+    
+                .btn_submit {
+                    color: color(light);
+                    font-weight: fontweight(semi-bold);
+                    border: none;
+                    border-radius: 10px;
+                    padding: 6px 30px 6px 30px;
+                    cursor: pointer;
+                }
+    
+                .submit-login {
+                    background-color: color(accentspink);
+                }
+    
+                .submit-register {
+                    background-color: color(accentsblue);
+                }
+            }
+        }
+    }
+    /* login page css ENDS HERE */
+
     // nav start
     .nav {
         // border: $bordercheck;
@@ -56,6 +165,10 @@ body {
         width: 100%;
         // height: 80px;
         padding: 50px 50px;
+        display: flex;
+        flex-flow: row;
+        justify-content: space-between;
+        z-index: 1;
 
         .logo {
             // border: $bordercheck;
@@ -68,6 +181,36 @@ body {
             span {
                 color: color(accentspink);
             }
+        }
+
+        .welcome_logout {
+            // border: $bordercheck;
+            width: 15%;
+            display: flex;
+            flex-flow: row;
+            justify-content: space-between;
+            font-size: 16px;
+
+            .welcome_user {
+
+                span {
+                    color: color(accentspink);
+                    font-weight: fontweight(semi-bold);
+                }
+            }
+
+            .logout {
+                
+                text-decoration: none;
+                color: color(dark);
+                cursor: pointer;
+
+                &:hover {
+                    font-weight: fontweight(semi-bold);
+                    color: color(accentspink);
+                }
+            }
+        
         }
     } // nav end
 
@@ -405,11 +548,63 @@ body {
             }
         } // item list end
     } // bottom end
+
+    // footer start - info bubble
+    .info_bubble {
+        // border: $bordercheck;
+        position: absolute;
+        bottom: 50px;
+        right: 50px;
+        padding: 12px 20px;
+        background: color(accentsblue);
+        border-radius: 50%;
+        z-index: 1;
+
+        .info {
+            color: color(light);
+            font-weight: fontweight(semi-bold);
+        }
+
+        &:hover {
+            border-radius: 0;
+
+            .info {
+                display: none;
+            }
+
+            .bubble_message {
+                display: inline-block;
+            }
+        }
+
+        .bubble_message {
+            display: none;
+            color: color(light);
+            font-weight: fontweight(semi-bold);
+
+            #save {
+                color: color(light);
+
+                &:hover {
+                    color: color(accentspink);
+                    cursor: pointer;
+                }
+            }
+        }
+    }
 }
 
 @media only screen and (min-width: 416px) and (max-width: 1045px) {
     body {
         // border: $bordercheck;
+
+        .nav {
+
+            .welcome_logout {
+                width: 25%;
+            }
+        }
+
         .top {
             // border: $bordercheck;
     
@@ -479,6 +674,10 @@ body {
             .logo {
                 // border: $bordercheck;
                 font-size: 18px;
+            }
+
+            .welcome_logout {
+                width: 60%;
             }
         }
     
@@ -695,5 +894,19 @@ body {
             } // item list end
 
         } // bottom end
+
+        // footer start - info bubble
+        .info_bubble {
+            // border: $bordercheck;
+            bottom: 100px;
+            right: 20px;
+
+            .bubble_message {
+
+                #save {
+                    color: color(accentspink);
+                }
+            }
+        }
     }
 }

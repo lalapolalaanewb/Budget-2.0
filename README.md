@@ -1,9 +1,14 @@
-Budget
+Budget Web App 2.0
 
-This Budget website is created only using HTML, CSS & SCSS and Vanilla JavaScript.
+This Budget Web App 2.0 is created using:-
+- FRONTEND: HTML, CSS & SCSS, and Vanilla JavaScript
+- BACKEND: Node JS
+- DATABASE: MongoDB 
 
-For the moment, this web only looks kinda okay in mobile view. I'm still suck at front-end programming. This is my second attempt on building everything from the scratch, from HTML to CSS which I'm not very good at. You can see it live here at myFiddle Codepen - https://jsfiddle.net/lalapolalaanewb/jsg4xc1w/ . Feel free to try it out.
+As for the moment this Budget Web App 2.0 is treated as an API due to my lack of knowledge. Instead of building it as an Web App itself I used JavaScript Fetch call to handle all data transfered between the FRONTEND and BACKEND. I just found out after working at it for about 90%, that I could use a package in Node JS called EJS (Embedded JavaScript Template) to properly build it as intended.
 
-Migrating from PHP-based to fully JavaScript-based is very challenging for me at least. Anyway, I'll update more details for this Budget Web App in near future. Learning through making. Hopefully my code will help you guys somehow. Or will actually help me getting more better at JavaScript programming with your comments and feedback.
+Anyway, I'm planning to update the code to work with EJS afterwards and will be posting the 3rd Phase or Style of this Budget Web App (should be the proper one finally).
 
-Thank you for spending time reading and trying my Web App. Till next time. Chao!
+And btw, you can have a look at the first style or the 1.0 of this Budget Web App here, https://jsfiddle.net/lalapolalaanewb/hx0sL5cf/ which I create just using simple HTML, CSS and Vanilla JavaScript with no BACKEND association at all.
+
+Anyway, thank you for spending time reading and trying my Web App. Till next time. Chao!"# Budget-2.0" 

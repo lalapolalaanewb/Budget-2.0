@@ -1,5 +1,96 @@
+// API URL
+const API_URL = 'http://localhost:5000'// fetch data from db
+
+// Fetch Data Controller - handles API data fetching
+const fetchData = (async () => {
+
+    // passing token
+    console.log(localStorage.getItem('auth-token'))
+    let token = {
+        token: localStorage.getItem('auth-token')
+    }
+
+    const res = await fetch(API_URL+'/token', {
+        method: 'POST',
+        body: JSON.stringify(token),
+        headers: {
+            'content-type': 'application/json'
+        }
+    })
+    const json = await res.json()
+
+    // const res = await fetch(API_URL)
+    // const json = await res.json()
+    // console.log(json)
+
+    return {
+        // pass data fetched from DB
+        passData: () => {
+            return json.data
+        },
+
+        // pass name fetched from DB
+        passName: () => {
+            return json.name
+        }
+    }
+})();
+
+// Save Data Controller - handles API data sending
+const saveData = (() => {
+
+    return {
+
+        // sending data to save in db
+        saveRefresh: async (data) => {
+
+            // passing token & data
+            let datas = {
+                data: data,
+                token: localStorage.getItem('auth-token')
+            }
+
+            // send stringify JSON
+            console.log(datas)
+            alert('Saving latest data')
+
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(datas),
+                headers: {
+                    'content-type': 'application/json'
+                }
+            })
+            const json = await res.json()
+            // console.log(json)
+
+            // if(json.message === 'Saved!'){
+            //     // to counter new updated data 'not loaded'
+            //     setTimeout(() => window.location.reload(), 2000);
+            // }
+
+            // OR
+            
+            // fetch(API_URL, {
+            //     method: 'POST',
+            //     body: JSON.stringify(datas),
+            //     headers: {
+            //         'content-type': 'application/json'
+            //     }
+            // })
+            // .then(res => res.json())
+            // .then(data => {
+            //     if(data.message === 'Saved!')
+            //     // to counter new updated data 'not loaded'
+            //     location.reload()
+            //     console.log('dh save')
+            // })
+        }
+    }
+})();
+
 // Budget Controller - handles all calculation
-let budgetController = (() => {
+let budgetController = (async(fD, sD) => {
 
     // declare data user inputted - function Constructor
     // Expense data
@@ -11,18 +102,32 @@ let budgetController = (() => {
     }
 
     // method to calculate expenses percentages
-    Expense.prototype.calcExpensesPercentages = function(totalInc) {
+    // Expense.prototype.calcExpensesPercentages = function(totalInc) {
+
+    //     if(totalInc > 0) {
+    //         this.percentage = Math.round((this.value / totalInc) * 100)
+    //     } else {
+    //         this.percentage = -1
+    //     }
+    // }
+    let calcExpensesPercentages = (percentage, value, totalInc) => {
 
         if(totalInc > 0) {
-            this.percentage = Math.round((this.value / totalInc) * 100)
+            percentage = Math.round((value / totalInc) * 100)
         } else {
-            this.percentage = -1
+            percentage = -1
         }
+
+        return percentage
     }
     // return calculated expenses percentages
-    Expense.prototype.getExpensesPercentages = function() {
+    // Expense.prototype.getExpensesPercentages = function() {
         
-        return this.percentage
+    //     return this.percentage
+    // }
+    let getExpensesPercentages = (percentage) => {
+        
+        return percentage
     }
 
     // Income data
@@ -46,34 +151,59 @@ let budgetController = (() => {
         data.totals[itemType] = sum
     }
 
-    // store all data here
-    let data = {
-        allItems: {
-            // store all expenses here
-            exp: [],
-            // store all incomes here
-            inc: []
-        },
-        // store total incomes & expenses
-        totals: {
-            // init value of expenses
-            exp: 0,
-            // init value of incomes
-            inc: 0
-        },
-        // store total budget
-        budget: 0,
-        // store percentage of total budget
-        // -1 means 'something is not in existance yet'
-        percentage: -1
+    // // 1. store all data here
+    // let data = {
+    //     allItems: {
+    //         // store all expenses here
+    //         exp: [],
+    //         // store all incomes here
+    //         inc: []
+    //     },
+    //     // store total incomes & expenses
+    //     totals: {
+    //         // init value of expenses
+    //         exp: 0,
+    //         // init value of incomes
+    //         inc: 0
+    //     },
+    //     // store total budget
+    //     budget: 0,
+    //     // store percentage of total budget
+    //     // -1 means 'something is not in existance yet'
+    //     percentage: -1
+    // }
+    // console.log(data)
+    let data, name
+
+    // 2. store all data from fetch json data
+    fD = await fD
+    data = fD.passData()
+    console.log(data)
+
+    // put fetched name from passName function into name
+    name = fD.passName()
+    console.log(name)
+
+    if(data.message === 'Accessed denied!' || data.message === 'Invalid token!') {
+
+        // console.log('Accessed denied!')
+        location.replace('/client/components/login.html')
     }
+    // if(data.message === 'Accessed denied!') {
+    //     console.log('Accessed denied! in app.js')
+    // } if(data.message === 'Invalid token!') {
+    //     console.log('Invalid token! in app.js')
+    // } else {
+    //     console.log('Success! in app.js')
+    // }
 
     // public functions declaration starts here
     return {
 
         // add new item to storage or data
         addNewItem: (itemType, itemDesc, itemValue) => {
-
+            // console.log('Data: ' + data)
+            // throw new Error("Pausing")
             let newItem, id
 
             // create new id of every new item
@@ -99,7 +229,7 @@ let budgetController = (() => {
 
         // delete existing item
         deleteExistingItem:  (itemType, id) => {
-            console.log('in delete: ' + itemType)
+            // console.log('in delete: ' + itemType)
             let ids, index
 
             // get new array of available id
@@ -115,6 +245,13 @@ let budgetController = (() => {
                 // using 'splice' with 2 arguments (whattodelete, noofelementwantstodelete)
                 data.allItems[itemType].splice(index, 1)
             }
+        },
+
+        // saving data once refresh or hit 'F5'
+        saveData: () => {
+
+            // alert saving data
+            sD.saveRefresh(data)
         },
 
         // calculate budget
@@ -143,26 +280,63 @@ let budgetController = (() => {
 
             // call the calcExpensesPercentages()
             // using forEach
-            data.allItems.exp.forEach(current => current.calcExpensesPercentages(data.totals.inc))
+            // data.allItems.exp.forEach(current => current.calcExpensesPercentages(data.totals.inc))
+            data.allItems.exp.forEach(current => {
+                
+                let percentage = calcExpensesPercentages(current.percentage, current.value, data.totals.inc)
+
+                current.percentage = percentage
+            })
         },
 
         // fetch or get the expenses percentages
         fetchExpensesPercentages: () => {
 
-            let allExpPercentages = data.allItems.exp.map(current => current.getExpensesPercentages())
+            // let allExpPercentages = data.allItems.exp.map(current => current.getExpensesPercentages())
+            let allExpPercentages = data.allItems.exp.map(current => getExpensesPercentages(current.percentage))
             
             return allExpPercentages
+        },
+
+        // return existing data in database
+        getUserDBItem: () => {
+
+            return {
+
+                // get item type 'inc'
+                itemTypeInc: data.allItems.inc,
+                // get item type 'exp'
+                itemTypeExp: data.allItems.exp
+            }
         },
 
         // return budget calculated to 'controller' to pass to 'UI controller'
         getBudget: () => {
 
-            return {
-                budget: data.budget,
-                totalInc: data.totals.inc,
-                totalExp: data.totals.exp,
-                percentage: data.percentage
+            // check if 'have' data or not
+            if(data.budget === 0 && data.totals.inc === 0 && data.totals.exp === 0 && data.percentage === -1) {
+                return {
+                    default: 0,
+                    budget: 0,
+                    totalInc: 0,
+                    totalExp: 0,
+                    percentage: -1 
+                }
+            } else {
+                return {
+                    default: 1,
+                    budget: data.budget,
+                    totalInc: data.totals.inc,
+                    totalExp: data.totals.exp,
+                    percentage: data.percentage
+                }
             }
+        },
+
+        // return name fetched to 'controller' to then be used in 'UIController'
+        getName: () => {
+
+            return name
         },
 
         // testing public function
@@ -173,7 +347,7 @@ let budgetController = (() => {
         }
     }
 
-})();
+})(fetchData, saveData);
 
 // UI Controller - handles all UI stuff
 let UIController = (() => {
@@ -194,7 +368,10 @@ let UIController = (() => {
         expensesPercentageLabel: '.item_percentage',
         expensesPercentageMobileLabel: '.item_percentage-mobile',
         itemListContainer: '.item_list',
-        budgetTitleMonthLabel: '.budget_title-month'
+        budgetTitleMonthLabel: '.budget_title-month',
+        welcomeUserText: '.welcome_user',
+        logoutLink: '.logout',
+        saveCurrentInfo: '#save'
     }
 
     // number formatting function
@@ -363,10 +540,10 @@ let UIController = (() => {
 
             // return a list of fields
             fields = document.querySelectorAll(DOMstrings.addItemDesc + ', ' + DOMstrings.addItemValue)
-            console.log(fields)
+            // console.log(fields)
             // convert to array - using slice (return copy of array)
             fieldsArray = Array.prototype.slice.call(fields)
-            console.log(fieldsArray)
+            // console.log(fieldsArray)
             // set the input fields to empty back
             fieldsArray.forEach(current => current.value = '')
 
@@ -403,13 +580,13 @@ let UIController = (() => {
 
         // display expenses percentages
         displayExpensesPercentages: expPercentages => {
-            console.log('in display: ' + expPercentages)
+            // console.log('in display: ' + expPercentages)
             // get all elements in the element class 'item_percentage' 
             let fields = document.querySelectorAll(DOMstrings.expensesPercentageLabel)
-            console.log(fields)
+            // console.log(fields)
             // get all elements in the element class 'item_percentage-mobile' 
             let fieldsMobile = document.querySelectorAll(DOMstrings.expensesPercentageMobileLabel)
-            console.log(fieldsMobile)
+            // console.log(fieldsMobile)
 
             let nodeListForEach = (list, callback) => {
 
@@ -448,6 +625,33 @@ let UIController = (() => {
             })
         },
 
+        // display 'Welcome User' & 'Logout Link'
+        displayWelcomeLogout: (name) => {
+
+            let htmlWelcomeUser, htmlLogoutLink, elementWelcomeUser, elementLogoutLink, loginURL
+
+            // loginURL = location.protocol + location.host + '/client/components/login.html'
+
+            elementWelcomeUser = DOMstrings.welcomeUserText
+            elementLogoutLink = DOMstrings.logoutLink
+
+            htmlWelcomeUser = `
+            Welcome, <span>${name.lastName}</span>
+            `
+
+            // htmlLogoutLink = `
+            // <a href="${loginURL}">Logout</a>
+            // `
+            htmlLogoutLink = `
+            Logout
+            `
+
+            // use insertAdjacentHTML to append above 'Welcome User' html
+            document.querySelector(elementWelcomeUser).insertAdjacentHTML('beforeend', htmlWelcomeUser)
+            // use insertAdjacentHTML to append above 'Logout Link' html
+            document.querySelector(elementLogoutLink).insertAdjacentHTML('beforeend', htmlLogoutLink)
+        },
+
         // display date month
         displayDate: () => {
 
@@ -483,8 +687,17 @@ let UIController = (() => {
 // Controller - handles all interactions between Budget Controller & UI Controller
 let controller = ((budgetCtrl, UICtrl) => {
 
+    let initAllCtrl = async () => {
+
+        UICtrl = await UICtrl
+        budgetCtrl = await budgetCtrl
+    }
+
     // setup addEventListener functions
     let setupEventListeners = () => {
+
+        // init all contolller first
+        initAllCtrl()
 
         // get the passed DOMstrings
         let DOM = UICtrl.getDOMstrings()
@@ -494,18 +707,45 @@ let controller = ((budgetCtrl, UICtrl) => {
         // call function to add item when the 'button' was pressed
         document.querySelector(DOM.addItemBtn).addEventListener('click', ctrlAddNewItem)
 
-        // addEventListener to react when user hit 'enter' key instead of the 'button'
-        document.addEventListener('keypress', event => {
+        document.querySelector(DOM.saveCurrentInfo).addEventListener('click', () => {
 
+            // 1. save data
+            budgetCtrl.saveData()
+            // 2. reload page after 1 sec
+            setTimeout(() => { window.location.reload() }, 1000)
+            // 3. allow user to add more data onto existing items
+            ctrlAddExistingItem()
+        })
+
+        // addEventListener to react when user hit a 'key' instead of the 'button'
+        document.addEventListener('keydown', event => {
+
+            // when user pressed 'enter' to insert new income or expenses
             if(event.keyCode === 13 || event.which === 13) {
 
                 // call function to add item
                 ctrlAddNewItem()
             }
+
+            // when user pressed 's' to 'save' data
+            if(event.keyCode === 83 || event.which === 83) {
+            // if(event.keyCode === 16 || event.which === 16) {
+
+                // call function to save existing item
+                budgetCtrl.saveData()
+                // window.location.reload()
+                setTimeout(() => { window.location.reload() }, 1000)
+                ctrlAddExistingItem()
+            }
+
+            // else console.log('None')
         })
 
-        // using event delegation
+        // using event delegation to delete items
         document.querySelector(DOM.itemListContainer).addEventListener('click', ctrlDeleteExistingItem)
+
+        // using event delegation to logout
+        document.querySelector(DOM.logoutLink).addEventListener('click', ctrlLogoutLink)
 
         // add onChange() event when user select '+' or '-'
         document.querySelector(DOM.addItemType).addEventListener('change', UICtrl.changeDivBGColor)
@@ -513,6 +753,9 @@ let controller = ((budgetCtrl, UICtrl) => {
 
     // update budget calculation
     let updateBudget = () => {
+
+        // init all contolller first
+        initAllCtrl()
 
         // 1. Calculate the budget
         budgetCtrl.calculateBudget()
@@ -526,6 +769,9 @@ let controller = ((budgetCtrl, UICtrl) => {
 
     // update sole percentage of expenses
     updateExpensesPercentage = () => {
+
+        // init all contolller first
+        initAllCtrl()
          
         // 1. Calculate the percentage
         budgetCtrl.calculateExpensesPercentages()
@@ -537,8 +783,42 @@ let controller = ((budgetCtrl, UICtrl) => {
         UICtrl.displayExpensesPercentages(expPercentages)
     }
 
+    // execute when refresh or rigth after login
+    let ctrlAddExistingItem = () => {
+        
+        // init all contolller first
+        initAllCtrl()
+
+        let existingItem
+
+        // 1. Get user existing item in db
+        existingItem = budgetCtrl.getUserDBItem()
+        // console.log(dbItem.itemTypeInc[0])
+
+        // 2. Update all existing items in DB to UI
+        // a. for item type - incomes
+        existingItem.itemTypeInc.forEach(async (current) => {
+            // console.log(current)
+            UICtrl.addListItems(current, 'inc')
+        })
+        // b. for item type - expenses
+        existingItem.itemTypeExp.forEach(async (current) => {
+            // console.log(current)
+            UICtrl.addListItems(current, 'exp')
+            
+            // 2. Read percentages from the budget controller
+            let expPercentages = budgetCtrl.fetchExpensesPercentages()
+
+            // 3. Update the percentages on UI
+            UICtrl.displayExpensesPercentages(expPercentages)
+        })
+    }
+
     // add new item function 
     let ctrlAddNewItem = () => {
+
+        // init all contolller first
+        initAllCtrl()
 
         let input, newItem
 
@@ -550,6 +830,7 @@ let controller = ((budgetCtrl, UICtrl) => {
 
             // 2. Add new item to the storage/database
             newItem = budgetCtrl.addNewItem(input.itemType, input.itemDesc, input.itemValue)
+            console.log(newItem)
 
             // 3. Update new item to the UI
             UICtrl.addListItems(newItem, input.itemType)
@@ -567,7 +848,10 @@ let controller = ((budgetCtrl, UICtrl) => {
     }
 
     // delete existing item function
-    let ctrlDeleteExistingItem = event => {
+    let ctrlDeleteExistingItem = (event) => {
+
+        // init all contolller first
+        initAllCtrl()
 
         let itemID, itemIDDesktop, itemIDMobile, splitID, itemType, ID
 
@@ -579,7 +863,7 @@ let controller = ((budgetCtrl, UICtrl) => {
         // itemID = itemIDDesktop = itemIDMobile
 
         if(itemIDDesktop) {
-            console.log(itemIDDesktop)
+            // console.log(itemIDDesktop)
             //  inc-id or exp-id, we want type = 'inc' or 'exp' & id = 'id'
             // we need to separate this string
             splitID = itemIDDesktop.split('-')
@@ -602,7 +886,7 @@ let controller = ((budgetCtrl, UICtrl) => {
             // 4. Calculate & update expenses percentages
             updateExpensesPercentage()
         } else if(itemIDMobile) {
-            console.log(itemIDMobile)
+            // console.log(itemIDMobile)
             //  inc-id or exp-id, we want type = 'inc' or 'exp' & id = 'id'
             // we need to separate this string
             splitID = itemIDMobile.split('-')
@@ -627,23 +911,59 @@ let controller = ((budgetCtrl, UICtrl) => {
         } else { console.log('False')}
     }
 
+    // logout
+    let ctrlLogoutLink = (event) => {
+
+        // init all contolller first
+        initAllCtrl()
+
+        let logoutLinkEvent, loginURL
+
+        logoutLinkEvent = event.target.id
+        // console.log(logoutLinkEvent)
+
+        if(logoutLinkEvent) {
+
+            // 1. kill all tokens in LocalStorage
+            window.localStorage.removeItem('auth-token')
+            // 2. set login path
+            loginURL = '/client/components/login.html'
+            // 3. back to login page
+            window.location.replace(loginURL)
+        }
+    }
+
     return {
 
         // create init fucntion to initialize data
-        init: () => {
+        init: async () => {
+
+            // init all contolller first
+            UICtrl = await UICtrl
+            budgetCtrl = await budgetCtrl
 
             console.log('Application has started!')
+
+            // document.querySelector('body').style.display = 'none'
+
+            // display 'Welcome' text & 'Logout' link
+            let nameUser = budgetCtrl.getName()
+            UICtrl.displayWelcomeLogout(nameUser)
 
             // display date
             UICtrl.displayDate()
 
-            // set all to init value of zero
-            UICtrl.displayBudget({
-                budget: 0,
-                totalInc: 0,
-                totalExp: 0,
-                percentage: -1
-            })
+            // display default data
+            let initBudget = budgetCtrl.getBudget()
+
+            if(initBudget.default === 0){
+
+                UICtrl.displayBudget(initBudget)
+            } else {
+
+                UICtrl.displayBudget(initBudget)
+                ctrlAddExistingItem()
+            }
 
             // call private setupEventListeners function
             setupEventListeners()
