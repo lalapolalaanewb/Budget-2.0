@@ -12,3 +12,4 @@ Anyway, I'm planning to update the code to work with EJS afterwards and will be 
 And btw, you can have a look at the first style or the 1.0 of this Budget Web App here, https://jsfiddle.net/lalapolalaanewb/hx0sL5cf/ which I create just using simple HTML, CSS and Vanilla JavaScript with no BACKEND association at all.
 
 Anyway, thank you for spending time reading and trying my Web App. Till next time. Chao!"# Budget-2.0" 
+"# Budget-2.0" 
